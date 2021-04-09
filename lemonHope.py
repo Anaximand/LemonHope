@@ -25,10 +25,11 @@ async def on_reaction_add(reaction, user):
 
 
 @lemon.command()
-async def remember(ctx, *arg):
-    name = arg[0]
+async def remember(ctx, *, arg):
+    split = arg.split(' ')
+    name = split[0]
     channel = ctx.message.channel
-    findString = ''.join(arg[1:])
+    findString = ''.join(split[1:])
     messages = await channel.history(limit=50).flatten()
     found = False
     quotepocket = getDBFromGuild(str(ctx.message.guild)).table('quote')
