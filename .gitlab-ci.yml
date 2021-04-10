@@ -1,0 +1,39 @@
+image: tiangolo/docker-with-compose
+
+variables:
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+
+before_script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+
+stages:
+  - build
+  - deploy
+
+build-prod:
+  tags:
+    - docker
+  stage: build
+  script:
+    - IMAGE_TAG=$IMAGE_TAG docker-compose pull
+    - IMAGE_TAG=$IMAGE_TAG docker-compose build
+    - docker push $IMAGE_TAG
+  only:
+    - master
+    - main
+
+deploy-prod:
+  tags:
+    - docker
+    - swarm
+  stage: deploy
+  script:
+    - docker stack rm $(echo $CI_PROJECT_NAME | sed 's/-docker//')
+    - sleep 10s
+    - docker stack deploy -c docker-compose.yml --with-registry-auth $(echo $CI_PROJECT_NAME | sed 's/-docker//')
+
+  only:
+    - master
+    - main
+
+
