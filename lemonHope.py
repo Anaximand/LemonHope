@@ -51,9 +51,9 @@ async def on_reaction_add(ctx, user):
 async def remember(ctx, *, arg):
     split = arg.split(' ')
 
-    name = split[0]
+    name = split[0].lower()
     channel = ctx.message.channel
-    findString = ''.join(split[1:])
+    findString = ''.join(split[1:]).lower()
     found = False
 
     print('Saving quote from ' + name + ' via text command')
@@ -63,7 +63,7 @@ async def remember(ctx, *, arg):
 
 
     for ms in messages:
-        if name in ms.author.name and (findString in ms.content or not findString) and "Lemon, " not in ms.content:
+        if name in ms.author.name.lower() and (findString in ms.content.lower() or not findString) and "Lemon, " not in ms.content:
             lock = asyncio.Lock()
             await lock.acquire()
             try:
