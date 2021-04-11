@@ -67,7 +67,11 @@ async def saveQuote(table, author, message, sendResponse):
         table.insert({'name': author, 'message': message})
         await sendResponse('Remembered that ' + author + ' said "' + message + '"')
 
-
+def getInt(s):
+    try:
+        return int(s)
+    except ValueError:
+        return None
 
 @lemon.event
 async def on_reaction_add(reaction, user):
@@ -135,5 +139,5 @@ async def quote(ctx, *arg):
     else:
         await ctx.send('Couldn\'t find that quote')
 
-        
+
 lemon.run(token)
