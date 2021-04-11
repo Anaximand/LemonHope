@@ -15,10 +15,17 @@ lemon = commands.Bot(command_prefix="Lemon, ")
 
 
 def getDBFromGuild(guild):
+    """
+    Retrieves db from guild name
+    """
     return TinyDB(r'data/' + guild + r'.json')
 
 
 def isAlreadyRemembered(table, author, msg):
+    """
+    Determines if a quote already exists
+    Returns None or quote document id
+    """
     query = Query()
     results = table.search(query.name.matches('.*' + author + '.*', flags=re.IGNORECASE) and query.message == msg)
 
@@ -33,17 +40,27 @@ def isAlreadyRemembered(table, author, msg):
 
 
 async def saveQuote(table, author, message, sendResponse):
-    # qid is overloaded - but it gets the job done cleanly
+    """
+    saveQuote to db
+    sendResponse is the send function from discord
+    """
+    # qid is overloaded - but it gets the job done
     qid = isAlreadyRemembered(table, author, message)
     if not qid:
         qid = table.insert({'name': author, 'message': message})
     await sendResponse('Remembered that ' + author + ' said "' + message + '" (#' + str(qid) + ')')
 
+
 def getInt(s):
+    """
+    Get int - helper function
+    Returns int or None
+    """
     try:
         return int(s)
     except ValueError:
         return None
+
 
 @lemon.event
 async def on_reaction_add(ctx, user):
@@ -76,7 +93,6 @@ async def remember(ctx, *, arg):
 
     messages = await channel.history(limit=50).flatten()
     quotepocket = getDBFromGuild(str(ctx.message.guild)).table('quote')
-
 
     for ms in messages:
         if name in ms.author.name.lower() and (findString in ms.content.lower() or not findString) and "Lemon, " not in ms.content:
