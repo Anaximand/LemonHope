@@ -25,7 +25,7 @@ def isAlreadyRemembered(table, author, msg):
 async def saveQuote(table, author, message, sendResponse):
     if not isAlreadyRemembered(table, author, message):
         table.insert({'name': author, 'message': message})
-        await sendResponse('Remembered that ' + author + ' said ' + message)
+        await sendResponse('Remembered that ' + author + ' said "' + message + '"')
 
 
 
@@ -74,7 +74,7 @@ async def remember(ctx, *, arg):
             found = True
             break
     if not found:
-        await ctx.send('Could not find a message from ' + name + ' containing ' + findString)
+        await ctx.send('Could not find a message from ' + name + ' containing "' + findString + '"')
 
 
 @lemon.command()
