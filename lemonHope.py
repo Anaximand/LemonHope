@@ -111,20 +111,34 @@ async def remember(ctx, *, arg):
 @lemon.command()
 async def quote(ctx, *arg):
     quotepocket = getDBFromGuild(str(ctx.message.guild)).table('quote')
+
+    # Parse query
+    searchQuery = None
+    try:
+        searchQuery = arg[0]
+    except IndexError:
+        pass
+
+    # Logic for number based searching
+    numCapture, numQuery = [None, None]
+    if searchQuery:
+        numCapture = re.compile('#(\d+)')
+        numQuery = numCapture.match(searchQuery)
+
     msg = None
     if len(arg) == 0:
         msg = random.choice(quotepocket.all())
-    elif getInt(arg[0]):
-        msg = quotepocket.get(doc_id=getInt(arg[0]))
+    elif numQuery:
+        msg = quotepocket.get(doc_id=int(numQuery.group(1)))
     else:
         query = Query()
         try:
-            msg = random.choice(quotepocket.search(query.name.matches('.*' + arg[0] + '.*', flags=re.IGNORECASE)))
+            msg = random.choice(quotepocket.search(query.name.matches('.*' + searchQuery + '.*', flags=re.IGNORECASE)))
         except IndexError:
             msg = None
 
     if msg:
-        await ctx.send('<' + msg['name'] + '> ' + msg['message'])
+        await ctx.send('<' + msg['name'] + '> ' + msg['message'] + ' (#' + str(msg.doc_id) + ')')
     else:
         await ctx.send('Couldn\'t find that quote')
 
