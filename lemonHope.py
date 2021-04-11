@@ -62,17 +62,6 @@ def getInt(s):
         return None
 
 
-async def saveQuote(table, author, message, sendResponse):
-    if not isAlreadyRemembered(table, author, message):
-        table.insert({'name': author, 'message': message})
-        await sendResponse('Remembered that ' + author + ' said "' + message + '"')
-
-def getInt(s):
-    try:
-        return int(s)
-    except ValueError:
-        return None
-
 @lemon.event
 async def on_reaction_add(reaction, user):
     if str(reaction.emoji) == '💬' and not any(r.me is True for r in reaction.message.reactions):
