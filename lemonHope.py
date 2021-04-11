@@ -20,13 +20,24 @@ def getDBFromGuild(guild):
 
 def isAlreadyRemembered(table, author, msg):
     query = Query()
-    return any(table.search(query.name.matches('.*' + author + '.*', flags=re.IGNORECASE) and query.message == msg))
+    results = table.search(query.name.matches('.*' + author + '.*', flags=re.IGNORECASE) and query.message == msg)
+
+    singleResult = None
+
+    try:
+        singleResult = results[0]
+    except IndexError:
+        return False
+
+    return singleResult.doc_id
 
 
 async def saveQuote(table, author, message, sendResponse):
-    if not isAlreadyRemembered(table, author, message):
-        table.insert({'name': author, 'message': message})
-        await sendResponse('Remembered that ' + author + ' said "' + message + '"')
+    # qid is overloaded - but it gets the job done cleanly
+    qid = isAlreadyRemembered(table, author, message)
+    if not qid:
+        qid = table.insert({'name': author, 'message': message})
+    await sendResponse('Remembered that ' + author + ' said "' + message + '" (#' + str(qid) + ')')
 
 def getInt(s):
     try:
@@ -92,7 +103,10 @@ async def quote(ctx, *arg):
         msg = quotepocket.get(doc_id=getInt(arg[0]))
     else:
         query = Query()
-        msg = random.choice(quotepocket.search(query.name.matches('.*' + arg[0] + '.*', flags=re.IGNORECASE)))
+        try:
+            msg = random.choice(quotepocket.search(query.name.matches('.*' + arg[0] + '.*', flags=re.IGNORECASE)))
+        except IndexError:
+            msg = None
 
     if msg:
         await ctx.send('<' + msg['name'] + '> ' + msg['message'])
