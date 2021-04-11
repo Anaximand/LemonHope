@@ -14,6 +14,22 @@ token = os.getenv('lemonhope_token')
 lemon = commands.Bot(command_prefix="Lemon, ")
 
 
+def with_lock(func):
+    """
+    Decorator to abstract our locking mechanism
+    Uses the standard asyncio.Lock()
+    """
+    async def doWithLock(*args, **kwargs):
+        lock = asyncio.Lock()
+        await lock.acquire()
+        try:
+            await func(*args, **kwargs)
+        finally:
+            lock.release()
+
+    return doWithLock
+
+
 def getDBFromGuild(guild):
     """
     Retrieves db from guild name
@@ -39,6 +55,7 @@ def isAlreadyRemembered(table, author, msg):
     return singleResult.doc_id
 
 
+@with_lock
 async def saveQuote(table, author, message, sendResponse):
     """
     saveQuote to db
@@ -67,14 +84,9 @@ async def on_reaction_add(reaction, user):
     if str(reaction.emoji) == '💬' and not any(r.me is True for r in reaction.message.reactions):
         print('Saving quote from ' + reaction.message.author.name + ' via reaction')
 
-        lock = asyncio.Lock()
         quotepocket = getDBFromGuild(str(reaction.message.guild)).table('quote')
-        await lock.acquire()
-        try:
-            await saveQuote(
-                    quotepocket, reaction.message.author.name, reaction.message.content, reaction.message.channel.send)
-        finally:
-            lock.release()
+        await saveQuote(
+                quotepocket, reaction.message.author.name, reaction.message.content, reaction.message.channel.send)
 
         await reaction.message.add_reaction('💬')
 
@@ -95,12 +107,7 @@ async def remember(ctx, *, arg):
 
     for ms in messages:
         if name in ms.author.name.lower() and (findString in ms.content.lower() or not findString) and "Lemon, " not in ms.content:
-            lock = asyncio.Lock()
-            await lock.acquire()
-            try:
-                await saveQuote(quotepocket, ms.author.name, ms.content, ctx.send)
-            finally:
-                lock.release()
+            await saveQuote(quotepocket, ms.author.name, ms.content, ctx.send)
 
             found = True
             break
