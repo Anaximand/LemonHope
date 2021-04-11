@@ -30,21 +30,21 @@ async def saveQuote(table, author, message, sendResponse):
 
 
 @lemon.event
-async def on_reaction_add(ctx, user):
-    if str(ctx.emoji) == '💬' and not any(r.me is True for r in ctx.message.reactions):
-        print('Saving quote from ' + ctx.message.author.name + ' via reaction')
+async def on_reaction_add(reaction, user):
+    if str(reaction.emoji) == '💬' and not any(r.me is True for r in reaction.message.reactions):
+        print('Saving quote from ' + reaction.message.author.name + ' via reaction')
 
         lock = asyncio.Lock()
-        quotepocket = getDBFromGuild(str(ctx.message.guild)).table('quote')
+        quotepocket = getDBFromGuild(str(reaction.message.guild)).table('quote')
 
         await lock.acquire()
         try:
             await saveQuote(
-                    quotepocket, ctx.message.author.name, ctx.message.content, ctx.message.channel.send)
+                    quotepocket, reaction.message.author.name, reaction.message.content, reaction.message.channel.send)
         finally:
             lock.release()
 
-        await ctx.message.add_reaction('💬')
+        await reaction.message.add_reaction('💬')
 
 
 @lemon.command()
