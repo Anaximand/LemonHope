@@ -1,10 +1,11 @@
-import random
-import os
-from discord.ext import commands
-from tinydb import TinyDB, Query
-from dotenv import load_dotenv
 import asyncio
+import os
+import random
 import re
+
+from discord.ext import commands
+from dotenv import load_dotenv
+from tinydb import TinyDB, Query
 
 print('Lemon is starting')
 load_dotenv()
@@ -14,12 +15,51 @@ lemon = commands.Bot(command_prefix="Lemon, ")
 
 
 def getDBFromGuild(guild):
+    """
+    Retrieves db from guild name
+    """
     return TinyDB(r'data/' + guild + r'.json')
 
 
 def isAlreadyRemembered(table, author, msg):
+    """
+    Determines if a quote already exists
+    Returns None or quote document id
+    """
     query = Query()
-    return any(table.search(query.name.matches('.*' + author + '.*', flags=re.IGNORECASE) and query.message == msg))
+    results = table.search(query.name.matches('.*' + author + '.*', flags=re.IGNORECASE) and query.message == msg)
+
+    singleResult = None
+
+    try:
+        singleResult = results[0]
+    except IndexError:
+        return False
+
+    return singleResult.doc_id
+
+
+async def saveQuote(table, author, message, sendResponse):
+    """
+    saveQuote to db
+    sendResponse is the send function from discord
+    """
+    # qid is overloaded - but it gets the job done
+    qid = isAlreadyRemembered(table, author, message)
+    if not qid:
+        qid = table.insert({'name': author, 'message': message})
+    await sendResponse('Remembered that ' + author + ' said "' + message + '" (#' + str(qid) + ')')
+
+
+def getInt(s):
+    """
+    Get int - helper function
+    Returns int or None
+    """
+    try:
+        return int(s)
+    except ValueError:
+        return None
 
 
 async def saveQuote(table, author, message, sendResponse):
@@ -36,7 +76,6 @@ async def on_reaction_add(reaction, user):
 
         lock = asyncio.Lock()
         quotepocket = getDBFromGuild(str(reaction.message.guild)).table('quote')
-
         await lock.acquire()
         try:
             await saveQuote(
@@ -61,7 +100,6 @@ async def remember(ctx, *, arg):
     messages = await channel.history(limit=50).flatten()
     quotepocket = getDBFromGuild(str(ctx.message.guild)).table('quote')
 
-
     for ms in messages:
         if name in ms.author.name.lower() and (findString in ms.content.lower() or not findString) and "Lemon, " not in ms.content:
             lock = asyncio.Lock()
@@ -83,11 +121,19 @@ async def quote(ctx, *arg):
     msg = None
     if len(arg) == 0:
         msg = random.choice(quotepocket.all())
+    elif getInt(arg[0]):
+        msg = quotepocket.get(doc_id=getInt(arg[0]))
     else:
         query = Query()
-        msg = random.choice(quotepocket.search(query.name.matches('.*' + arg[0] + '.*', flags=re.IGNORECASE)))
+        try:
+            msg = random.choice(quotepocket.search(query.name.matches('.*' + arg[0] + '.*', flags=re.IGNORECASE)))
+        except IndexError:
+            msg = None
 
-    await ctx.send('<' + msg['name'] + '> ' + msg['message'])
+    if msg:
+        await ctx.send('<' + msg['name'] + '> ' + msg['message'])
+    else:
+        await ctx.send('Couldn\'t find that quote')
 
-
+        
 lemon.run(token)
