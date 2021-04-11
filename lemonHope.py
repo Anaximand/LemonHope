@@ -1,10 +1,11 @@
-import random
-import os
-from discord.ext import commands
-from tinydb import TinyDB, Query
-from dotenv import load_dotenv
 import asyncio
+import os
+import random
 import re
+
+from discord.ext import commands
+from dotenv import load_dotenv
+from tinydb import TinyDB, Query
 
 print('Lemon is starting')
 load_dotenv()
@@ -27,7 +28,11 @@ async def saveQuote(table, author, message, sendResponse):
         table.insert({'name': author, 'message': message})
         await sendResponse('Remembered that ' + author + ' said "' + message + '"')
 
-
+def getInt(s):
+    try:
+        return int(s)
+    except ValueError:
+        return None
 
 @lemon.event
 async def on_reaction_add(ctx, user):
@@ -83,11 +88,16 @@ async def quote(ctx, *arg):
     msg = None
     if len(arg) == 0:
         msg = random.choice(quotepocket.all())
+    elif getInt(arg[0]):
+        msg = quotepocket.get(doc_id=getInt(arg[0]))
     else:
         query = Query()
         msg = random.choice(quotepocket.search(query.name.matches('.*' + arg[0] + '.*', flags=re.IGNORECASE)))
 
-    await ctx.send('<' + msg['name'] + '> ' + msg['message'])
+    if msg:
+        await ctx.send('<' + msg['name'] + '> ' + msg['message'])
+    else:
+        await ctx.send('Couldn\'t find that quote')
 
 
 lemon.run(token)
