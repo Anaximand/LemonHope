@@ -25,7 +25,6 @@ def isAlreadyRemembered(table, author, msg):
 async def saveQuote(table, author, message, sendResponse):
     if not isAlreadyRemembered(table, author, message):
         table.insert({'name': author, 'message': message})
-        print(sendResponse)
         await sendResponse('Remembered that ' + author + ' said ' + message)
 
 
@@ -81,13 +80,14 @@ async def remember(ctx, *, arg):
 @lemon.command()
 async def quote(ctx, *arg):
     quotepocket = getDBFromGuild(str(ctx.message.guild)).table('quote')
+    msg = None
     if len(arg) == 0:
         msg = random.choice(quotepocket.all())
-        await ctx.send('<' + msg['name'] + '> ' + msg['message'])
     else:
         query = Query()
         msg = random.choice(quotepocket.search(query.name.matches('.*' + arg[0] + '.*', flags=re.IGNORECASE)))
-        await ctx.send('<' + msg['name'] + '> ' + msg['message'])
+
+    await ctx.send('<' + msg['name'] + '> ' + msg['message'])
 
 
 lemon.run(token)
