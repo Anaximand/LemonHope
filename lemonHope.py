@@ -14,6 +14,22 @@ token = os.getenv('lemonhope_token')
 lemon = commands.Bot(command_prefix="Lemon, ")
 
 
+def with_lock(func):
+    """
+    Decorator to abstract our locking mechanism
+    Uses the standard asyncio.Lock()
+    """
+    async def doWithLock(*args, **kwargs):
+        lock = asyncio.Lock()
+        await lock.acquire()
+        try:
+            await func(*args, **kwargs)
+        finally:
+            lock.release()
+
+    return doWithLock
+
+
 def getDBFromGuild(guild):
     """
     Retrieves db from guild name
@@ -39,6 +55,7 @@ def isAlreadyRemembered(table, author, msg):
     return singleResult.doc_id
 
 
+@with_lock
 async def saveQuote(table, author, message, sendResponse):
     """
     saveQuote to db
@@ -62,26 +79,14 @@ def getInt(s):
         return None
 
 
-async def saveQuote(table, author, message, sendResponse):
-    if not isAlreadyRemembered(table, author, message):
-        table.insert({'name': author, 'message': message})
-        await sendResponse('Remembered that ' + author + ' said "' + message + '"')
-
-
-
 @lemon.event
 async def on_reaction_add(reaction, user):
     if str(reaction.emoji) == '💬' and not any(r.me is True for r in reaction.message.reactions):
         print('Saving quote from ' + reaction.message.author.name + ' via reaction')
 
-        lock = asyncio.Lock()
         quotepocket = getDBFromGuild(str(reaction.message.guild)).table('quote')
-        await lock.acquire()
-        try:
-            await saveQuote(
-                    quotepocket, reaction.message.author.name, reaction.message.content, reaction.message.channel.send)
-        finally:
-            lock.release()
+        await saveQuote(
+                quotepocket, reaction.message.author.name, reaction.message.content, reaction.message.channel.send)
 
         await reaction.message.add_reaction('💬')
 
@@ -102,12 +107,7 @@ async def remember(ctx, *, arg):
 
     for ms in messages:
         if name in ms.author.name.lower() and (findString in ms.content.lower() or not findString) and "Lemon, " not in ms.content:
-            lock = asyncio.Lock()
-            await lock.acquire()
-            try:
-                await saveQuote(quotepocket, ms.author.name, ms.content, ctx.send)
-            finally:
-                lock.release()
+            await saveQuote(quotepocket, ms.author.name, ms.content, ctx.send)
 
             found = True
             break
@@ -118,22 +118,36 @@ async def remember(ctx, *, arg):
 @lemon.command()
 async def quote(ctx, *arg):
     quotepocket = getDBFromGuild(str(ctx.message.guild)).table('quote')
+
+    # Parse query
+    searchQuery = None
+    try:
+        searchQuery = arg[0]
+    except IndexError:
+        pass
+
+    # Logic for number based searching
+    numCapture, numQuery = [None, None]
+    if searchQuery:
+        numCapture = re.compile('#(\d+)')
+        numQuery = numCapture.match(searchQuery)
+
     msg = None
     if len(arg) == 0:
         msg = random.choice(quotepocket.all())
-    elif getInt(arg[0]):
-        msg = quotepocket.get(doc_id=getInt(arg[0]))
+    elif numQuery:
+        msg = quotepocket.get(doc_id=int(numQuery.group(1)))
     else:
         query = Query()
         try:
-            msg = random.choice(quotepocket.search(query.name.matches('.*' + arg[0] + '.*', flags=re.IGNORECASE)))
+            msg = random.choice(quotepocket.search(query.name.matches('.*' + searchQuery + '.*', flags=re.IGNORECASE)))
         except IndexError:
             msg = None
 
     if msg:
-        await ctx.send('<' + msg['name'] + '> ' + msg['message'])
+        await ctx.send('<' + msg['name'] + '> ' + msg['message'] + ' (#' + str(msg.doc_id) + ')')
     else:
         await ctx.send('Couldn\'t find that quote')
 
-        
+
 lemon.run(token)
