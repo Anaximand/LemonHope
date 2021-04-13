@@ -10,24 +10,9 @@ from tinydb import TinyDB, Query
 print('Lemon is starting')
 load_dotenv()
 token = os.getenv('lemonhope_token')
+saveLock = asyncio.Lock()
 
 lemon = commands.Bot(command_prefix="Lemon, ")
-
-
-def with_lock(func):
-    """
-    Decorator to abstract our locking mechanism
-    Uses the standard asyncio.Lock()
-    """
-    async def doWithLock(*args, **kwargs):
-        lock = asyncio.Lock()
-        await lock.acquire()
-        try:
-            await func(*args, **kwargs)
-        finally:
-            lock.release()
-
-    return doWithLock
 
 
 def getDBFromGuild(guild):
@@ -45,8 +30,6 @@ def isAlreadyRemembered(table, author, msg):
     query = Query()
     results = table.search(query.name.matches('.*' + author + '.*', flags=re.IGNORECASE) and query.message == msg)
 
-    singleResult = None
-
     try:
         singleResult = results[0]
     except IndexError:
@@ -55,17 +38,17 @@ def isAlreadyRemembered(table, author, msg):
     return singleResult.doc_id
 
 
-@with_lock
 async def saveQuote(table, author, message, sendResponse):
     """
     saveQuote to db
     sendResponse is the send function from discord
     """
-    # qid is overloaded - but it gets the job done
-    qid = isAlreadyRemembered(table, author, message)
-    if not qid:
-        qid = table.insert({'name': author, 'message': message})
-    await sendResponse('Remembered that ' + author + ' said "' + message + '" (#' + str(qid) + ')')
+    async with saveLock:
+        # qid is overloaded - but it gets the job done
+        qid = isAlreadyRemembered(table, author, message)
+        if not qid:
+            qid = table.insert({'name': author, 'message': message})
+        await sendResponse('Remembered that ' + author + ' said "' + message + '" (#' + str(qid) + ')')
 
 
 def getInt(s):
