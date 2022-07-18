@@ -11,7 +11,7 @@ class LegButts(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        content = message.content
+        content = message.content.lower()
         author = message.author
         guild = message.guild
 
