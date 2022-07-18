@@ -5,7 +5,7 @@ BUTT_IS_LEGS = 'butt is legs'
 BUTT_IS_NOT_LEGS = 'butt is not legs'
 NO_BUTT_OR_LEGS = 'no butt or legs'
 
-class LegButts(commands.Cog):
+class Legs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -39,4 +39,4 @@ class LegButts(commands.Cog):
 
 def setup(bot) -> None:
     """Load the Quotes cog."""
-    bot.add_cog(LegButts(bot))
+    bot.add_cog(Legs(bot))
