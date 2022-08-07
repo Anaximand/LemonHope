@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 import quotes.commands as quotes
 import legs.commands as legs
+import conversions.commands as conversions
 
 def run():
     print('Lemon is starting')
@@ -15,6 +16,7 @@ def run():
 
     quotes.setup(lemon)
     legs.setup(lemon)
+    conversions.setup(lemon)
 
     lemon.run(token)
 
