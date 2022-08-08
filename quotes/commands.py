@@ -5,15 +5,18 @@ from discord.ext import commands
 from tinydb import Query
 
 from utils import CommandModule, getDBFromGuild
-from quotes.utils import isAlreadyRemembered, saveQuote, getInt, isChannelPrivate
+from quotes.utils import isAlreadyRemembered, saveQuote, getInt, shouldExcludeChannel
 
 
 class Quotes(CommandModule):
+    def __init__(self, bot):
+        CommandModule.__init__(self, bot)
+        self.exclude = self.bot.config.get('channel_excludes')
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
         # Return early if private channel
-        if isChannelPrivate(reaction.message.channel):
+        if shouldExcludeChannel(reaction.message.channel, self.exclude):
             return
 
         if str(reaction.emoji) == '💬' and not any(r.me is True for r in reaction.message.reactions):
@@ -28,8 +31,8 @@ class Quotes(CommandModule):
     @commands.command()
     async def remember(self, ctx, *, arg):
         # Return early if private channel
-        if isChannelPrivate(ctx.channel):
-            return await ctx.send('Sorry! I can\'t remember anything in a private channel')
+        if shouldExcludeChannel(ctx.channel, self.exclude):
+            return await ctx.send('Sorry! I can\'t remember anything in this channel')
 
         split = arg.split(' ')
 

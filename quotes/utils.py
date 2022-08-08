@@ -1,21 +1,15 @@
+import os
 import re
 from tinydb import Query
 
 from utils import getGlobalSaveLock
 from discord.abc import PrivateChannel
 
-private_channel_quotes = os.getenv('private_channel_quotes').lower() == "true"
-
-def isChannelPrivate(channel) -> bool:
+def shouldExcludeChannel(channel, excludes) -> bool:
     """
-    Returns if a channel is private.
-    Private channel quotes flag will always override this, allowing quotes to work in private channels
+    Returns if a channel is excluded from quotes
     """
-    # Always return true if private channel quotes is enabled
-    if private_channel_quotes:
-        return True
-
-    return isinstance(ctx.channel, PrivateChannel)
+    return channel.id in excludes
 
 def isAlreadyRemembered(table, author, msg):
     """
