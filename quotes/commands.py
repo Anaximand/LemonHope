@@ -15,7 +15,7 @@ class Quotes(CommandModule):
         if str(reaction.emoji) == '💬' and not any(r.me is True for r in reaction.message.reactions):
             quotepocket = getDBFromGuild(str(reaction.message.guild)).table('quote')
             qid = await saveQuote(
-                    quotepocket, reaction.message.author.name, reaction.message.content, reaction.message.channel.send)
+                    quotepocket, reaction.message.author.name, reaction.message.content, reaction.message.jump_url, reaction.message.channel.send)
             self.logger.info('Saving quote #%d from %s via reaction', qid, reaction.message.author.name)
 
             await reaction.message.add_reaction('💬')
@@ -35,7 +35,7 @@ class Quotes(CommandModule):
 
         for ms in messages:
             if name in ms.author.name.lower() and (findString in ms.content.lower() or not findString) and "Lemon, " not in ms.content:
-                qid = await saveQuote(quotepocket, ms.author.name, ms.content, ctx.send)
+                qid = await saveQuote(quotepocket, ms.author.name, ms.content, ms.jump_url, ctx.send)
                 self.logger.info('Saving quote #%d from %s via text command', qid, name)
 
                 found = True
@@ -75,7 +75,10 @@ class Quotes(CommandModule):
                 msg = None
 
         if msg:
-            await ctx.send('<' + msg['name'] + '> ' + msg['message'] + ' (#' + str(msg.doc_id) + ')')
+            url = msg.get('url')
+            url = '' if not url else url
+
+            await ctx.send('<%s> %s (#%d) %s' % (msg['name'], msg['message'], msg.doc_id, url))
         else:
             await ctx.send('Couldn\'t find that quote')
 

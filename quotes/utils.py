@@ -19,7 +19,7 @@ def isAlreadyRemembered(table, author, msg):
     return singleResult.doc_id
 
 
-async def saveQuote(table, author, message, sendResponse):
+async def saveQuote(table, author, message, url, sendMessage):
     """
     saveQuote to db
     sendResponse is the send function from discord
@@ -28,8 +28,8 @@ async def saveQuote(table, author, message, sendResponse):
         # qid is overloaded - but it gets the job done
         qid = isAlreadyRemembered(table, author, message)
         if not qid:
-            qid = table.insert({'name': author, 'message': message})
-        await sendResponse('Remembered that %s said "%s" (#%d)' % (author, message, qid))
+            qid = table.insert({'name': author, 'message': message, 'url': url})
+        sentMessage = await sendMessage('Remembered that %s said "%s" (#%d) (%s)' % (author, message, qid, url))
         return qid
 
 
