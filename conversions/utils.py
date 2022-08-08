@@ -21,7 +21,7 @@ def getConversionTupleFromMessage(msg: str) -> List[Tuple[str, float]]:
     Returns a list of conversion tuples (str, float)
     """
     validUnits = "|".join(CONVERSION_MAP.keys())
-    conversionReg = re.compile(r'(?P<value>\d+\.?(\d+)?)(?P<unit>%s)' % validUnits)
+    conversionReg = re.compile(r'(?P<value>\d+\.?(\d+)?)\W?(?P<unit>(?i)%s)' % validUnits)
     matches = conversionReg.finditer(msg)
 
     return list(map(reMatchToTuple, matches))
