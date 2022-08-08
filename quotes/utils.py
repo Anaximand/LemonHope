@@ -29,7 +29,8 @@ async def saveQuote(table, author, message, sendResponse):
         qid = isAlreadyRemembered(table, author, message)
         if not qid:
             qid = table.insert({'name': author, 'message': message})
-        await sendResponse('Remembered that ' + author + ' said "' + message + '" (#' + str(qid) + ')')
+        await sendResponse('Remembered that %s said "%s" (#%d)' % (author, message, qid))
+        return qid
 
 
 def getInt(s):

@@ -1,9 +1,10 @@
 from discord.ext import commands
 from conversions.utils import getConversionTupleFromMessage, convertMatch, buildConvertionStr
 
-class Conversions(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
+from utils import CommandModule
+
+
+class Conversions(CommandModule):
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -19,6 +20,8 @@ class Conversions(commands.Cog):
 
         allConversions = list(map(convertMatch, matchTuples))
         allConversionsLen = len(allConversions)
+
+        self.logger.info('Converting %d figures for %s', allConversionsLen, message.author.name)
 
         response = ''
         for idx, conversion in enumerate(allConversions):
@@ -40,5 +43,5 @@ class Conversions(commands.Cog):
 
 
 def setup(bot) -> None:
-    """Load the Quotes cog."""
+    """Load the Conversions cog."""
     bot.add_cog(Conversions(bot))

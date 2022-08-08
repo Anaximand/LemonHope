@@ -4,23 +4,19 @@ import re
 from discord.ext import commands
 from tinydb import Query
 
-from utils import getDBFromGuild
+from utils import CommandModule, getDBFromGuild
 from quotes.utils import isAlreadyRemembered, saveQuote, getInt
 
 
-class Quotes(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
+class Quotes(CommandModule):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
         if str(reaction.emoji) == '💬' and not any(r.me is True for r in reaction.message.reactions):
-            print('Saving quote from ' + reaction.message.author.name + ' via reaction')
-
             quotepocket = getDBFromGuild(str(reaction.message.guild)).table('quote')
-            await saveQuote(
+            qid = await saveQuote(
                     quotepocket, reaction.message.author.name, reaction.message.content, reaction.message.channel.send)
+            self.logger.info('Saving quote #%d from %s via reaction', qid, reaction.message.author.name)
 
             await reaction.message.add_reaction('💬')
 
@@ -34,19 +30,19 @@ class Quotes(commands.Cog):
         findString = ''.join(split[1:]).lower()
         found = False
 
-        print('Saving quote from ' + name + ' via text command')
-
         messages = await channel.history(limit=50).flatten()
         quotepocket = getDBFromGuild(str(ctx.message.guild)).table('quote')
 
         for ms in messages:
             if name in ms.author.name.lower() and (findString in ms.content.lower() or not findString) and "Lemon, " not in ms.content:
-                await saveQuote(quotepocket, ms.author.name, ms.content, ctx.send)
+                qid = await saveQuote(quotepocket, ms.author.name, ms.content, ctx.send)
+                self.logger.info('Saving quote #%d from %s via text command', qid, name)
 
                 found = True
                 break
         if not found:
             await ctx.send('Could not find a message from ' + name + ' containing "' + findString + '"')
+
 
 
     @commands.command()

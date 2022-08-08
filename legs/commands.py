@@ -1,13 +1,14 @@
 from discord.ext import commands
 from discord.utils import get
 
+from utils import CommandModule
+
 BUTT_IS_LEGS = 'butt is legs'
 BUTT_IS_NOT_LEGS = 'butt is not legs'
 NO_BUTT_OR_LEGS = 'no butt or legs'
 
-class Legs(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
+
+class Legs(CommandModule):
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -26,6 +27,7 @@ class Legs(commands.Cog):
         if role_to_give:
             await self.removeRoles(guild, author)
             role = get(guild.roles, name=role_to_give)
+            self.logger.info('Granting "%s" to %s', role_to_give, author.name)
             await author.add_roles(role)
 
         if NO_BUTT_OR_LEGS in content:
