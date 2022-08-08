@@ -22,6 +22,10 @@ def run():
 
     lemon = commands.Bot(command_prefix="Lemon, ", log_handler=None)
 
+    # Todo - make a better config
+    lemon.config = {}
+    lemon.config['exclude_channels'] = [int(channel) for channel in (os.getenv('exclude_channels') or '').split(',') if channel != '']
+
     quotes.setup(lemon)
     legs.setup(lemon)
     conversions.setup(lemon)
