@@ -5,13 +5,17 @@ from discord.ext import commands
 from tinydb import Query
 
 from utils import CommandModule, getDBFromGuild
-from quotes.utils import isAlreadyRemembered, saveQuote, getInt
+from quotes.utils import isAlreadyRemembered, saveQuote, getInt, isChannelPrivate
 
 
 class Quotes(CommandModule):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
+        # Return early if private channel
+        if isChannelPrivate(reaction.message.channel):
+            return
+
         if str(reaction.emoji) == '💬' and not any(r.me is True for r in reaction.message.reactions):
             quotepocket = getDBFromGuild(str(reaction.message.guild)).table('quote')
             qid = await saveQuote(
@@ -23,6 +27,10 @@ class Quotes(CommandModule):
 
     @commands.command()
     async def remember(self, ctx, *, arg):
+        # Return early if private channel
+        if isChannelPrivate(ctx.channel):
+            return await ctx.send('Sorry! I can\'t remember anything in a private channel')
+
         split = arg.split(' ')
 
         name = split[0].lower()
