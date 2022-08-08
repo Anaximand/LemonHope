@@ -21,7 +21,7 @@ def getConversionTupleFromMessage(msg: str) -> List[Tuple[str, float]]:
     Returns a list of conversion tuples (str, float)
     """
     validUnits = "|".join(CONVERSION_MAP.keys())
-    conversionReg = re.compile(r'(?P<value>\d+\.?(\d+)?)(?P<unit>%s)' % validUnits)
+    conversionReg = re.compile(r'(?P<value>\d+\.?(\d+)?)\W?(?P<unit>(?i)%s)' % validUnits)
     matches = conversionReg.finditer(msg)
 
     return list(map(reMatchToTuple, matches))
@@ -66,7 +66,22 @@ def convertCelsiusToFahrenheit(celsius: float) -> Tuple[float, str]:
     """
     return (celsius * 1.8 + 32, 'f')
 
+def convertKilogramsToPounds(kilogram: float) -> Tuple[float, str]:
+    """
+    Converts kilogram to pounds.
+    Return (pounds, unit)
+    """
+    return (kilogram * 2.205, 'lb')
+
+def convertPoundsToKilograms(pound: float) -> Tuple[float, str]:
+    """
+    Converts pounds to kilogram.
+    Return (kilograms, unit)
+    """
+    return (pound / 2.205, 'kg')
+
 def notImplemented():
+
     """
     Returns None
     """
@@ -75,4 +90,6 @@ def notImplemented():
 CONVERSION_MAP = {
     'f': convertFahrenheitToCelsius,
     'c': convertCelsiusToFahrenheit,
+    'kg': convertKilogramsToPounds,
+    'lb': convertPoundsToKilograms,
 }
