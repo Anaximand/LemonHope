@@ -11,7 +11,7 @@ from quotes.utils import isAlreadyRemembered, saveQuote, getInt, shouldExcludeCh
 class Quotes(CommandModule):
     def __init__(self, bot):
         CommandModule.__init__(self, bot)
-        self.exclude = self.bot.config.get('channel_excludes')
+        self.exclude = self.bot.config.get('exclude_channels')
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
