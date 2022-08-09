@@ -59,6 +59,13 @@ def convertFahrenheitToCelsius(fahrenheit: float) -> Tuple[float, str]:
     """
     return ((fahrenheit - 32) / 1.8, 'c')
 
+def convertKelvinToCelsius(kelvin: float) -> Tuple[float, str]:
+    """
+    Converts kelvin to celsius
+    Returns (kelvin, unit)
+    """
+    return (kelvin - 273.15, 'kelvin')
+
 def convertCelsiusToFahrenheit(celsius: float) -> Tuple[float, str]:
     """
     Converts celsius to fahrenheit
@@ -90,6 +97,7 @@ def notImplemented():
 CONVERSION_MAP = {
     'f': convertFahrenheitToCelsius,
     'c': convertCelsiusToFahrenheit,
+    'kelvin': convertKelvinToCelsius,
     'kg': convertKilogramsToPounds,
     'lb': convertPoundsToKilograms,
 }
