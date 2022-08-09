@@ -64,7 +64,7 @@ def convertKelvinToCelsius(kelvin: float) -> Tuple[float, str]:
     Converts kelvin to celsius
     Returns (kelvin, unit)
     """
-    return (kelvin - 273.15, 'kelvin')
+    return (kelvin - 273.15, 'c')
 
 def convertCelsiusToFahrenheit(celsius: float) -> Tuple[float, str]:
     """
