@@ -20,8 +20,13 @@ def getConversionTupleFromMessage(msg: str) -> List[Tuple[str, float]]:
     Given a message, builds Conversion Tuples
     Returns a list of conversion tuples (str, float)
     """
+    # Return early if a URL
+    urlReg = re.compile(r'(https?://)?(www\.)?([a-zA-Z0-9]+(-?[a-zA-Z0-9])*\.)+[\w]{2,}(/\S*)?', re.IGNORECASE)
+    if urlReg.match(msg):
+        return list()
+
     validUnits = "|".join(CONVERSION_MAP.keys())
-    conversionReg = re.compile(r'(?P<value>\d+\.?(\d+)?)\W?(?P<unit>(?i)%s)' % validUnits)
+    conversionReg = re.compile(r'(?P<value>-?\d+\.?(\d+)?) ?(?P<unit>%s)' % validUnits, re.IGNORECASE)
     matches = conversionReg.finditer(msg)
 
     return list(map(reMatchToTuple, matches))
