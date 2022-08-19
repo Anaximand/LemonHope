@@ -39,7 +39,7 @@ class Conversions(CommandModule):
 
             response += messageSegment
 
-        await message.channel.send(response)
+        await message.reply(response, mention_author=False)
 
 
 async def setup(bot) -> None:
