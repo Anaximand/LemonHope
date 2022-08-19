@@ -3,12 +3,13 @@ from tinydb import Query
 
 from utils import getGlobalSaveLock
 
-def parseMonthDay(datestr):
-    monthDay = None
+def formatDate(dt):
+ return dt.strftime('%m/%d')
 
+def parseMonthDay(datestr):
     try:
-        datetime = parser.parse(datestr)
-        return datetime.strftime('%m/%d')
+        dt = parser.parse(datestr)
+        return formatBirthday(dt)
     except:
         return None
 
@@ -23,6 +24,11 @@ async def saveBirthday(table, birthday, authorId):
         else:
             table.insert({'author': authorId, 'birthday': birthday})
 
+async def getBirthdaysOnDate(table, date):
+    searchDate = formatDate(date)
+    query = Query()
+
+    return table.search(query.birthday == searchDate)
 
 def isAlreadySaved(table, birthday, authorId):
     query = Query()
