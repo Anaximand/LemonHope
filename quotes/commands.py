@@ -41,7 +41,7 @@ class Quotes(CommandModule):
         findString = ''.join(split[1:]).lower()
         found = False
 
-        messages = await channel.history(limit=50).flatten()
+        messages = [message async for message in channel.history(limit=50)]
         quotepocket = getDBFromGuild(str(ctx.message.guild)).table('quote')
 
         for ms in messages:

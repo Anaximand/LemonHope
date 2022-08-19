@@ -16,9 +16,7 @@ logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(name)s: %(mess
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-intents = Intents.default()
-intents.messages = True
-intents.reactions = True
+intents = Intents(messages=True, message_content=True, reactions=True, members=True, guilds=True)
 
 async def registerModules(lemon):
     await quotes.setup(lemon)
