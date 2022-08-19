@@ -7,6 +7,7 @@ from tinydb import Query
 from utils import CommandModule, getDBFromGuild
 from quotes.utils import isAlreadyRemembered, saveQuote, getInt, shouldExcludeChannel
 
+TABLE_NAME = 'quote'
 
 class Quotes(CommandModule):
     def __init__(self, bot):
@@ -20,7 +21,7 @@ class Quotes(CommandModule):
             return
 
         if str(reaction.emoji) == '💬' and not any(r.me is True for r in reaction.message.reactions):
-            quotepocket = getDBFromGuild(str(reaction.message.guild)).table('quote')
+            quotepocket = getDBFromGuild(str(reaction.message.guild)).table(TABLE_NAME)
             qid = await saveQuote(
                     quotepocket, reaction.message.author.name, reaction.message.content, reaction.message.jump_url, reaction.message.channel.send)
             self.logger.info('Saving quote #%d from %s via reaction', qid, reaction.message.author.name)
@@ -42,7 +43,7 @@ class Quotes(CommandModule):
         found = False
 
         messages = [message async for message in channel.history(limit=50)]
-        quotepocket = getDBFromGuild(str(ctx.message.guild)).table('quote')
+        quotepocket = getDBFromGuild(str(ctx.message.guild)).table(TABLE_NAME)
 
         for ms in messages:
             if name in ms.author.name.lower() and (findString in ms.content.lower() or not findString) and "Lemon, " not in ms.content:
@@ -58,7 +59,7 @@ class Quotes(CommandModule):
 
     @commands.command()
     async def quote(self, ctx, *arg):
-        quotepocket = getDBFromGuild(str(ctx.message.guild)).table('quote')
+        quotepocket = getDBFromGuild(str(ctx.message.guild)).table(TABLE_NAME)
 
         # Parse query
         searchQuery = None
