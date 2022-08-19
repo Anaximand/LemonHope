@@ -42,6 +42,6 @@ class Conversions(CommandModule):
         await message.channel.send(response)
 
 
-def setup(bot) -> None:
+async def setup(bot) -> None:
     """Load the Conversions cog."""
-    bot.add_cog(Conversions(bot))
+    await bot.add_cog(Conversions(bot))

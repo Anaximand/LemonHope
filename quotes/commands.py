@@ -41,7 +41,7 @@ class Quotes(CommandModule):
         findString = ''.join(split[1:]).lower()
         found = False
 
-        messages = await channel.history(limit=50).flatten()
+        messages = [message async for message in channel.history(limit=50)]
         quotepocket = getDBFromGuild(str(ctx.message.guild)).table('quote')
 
         for ms in messages:
@@ -94,6 +94,6 @@ class Quotes(CommandModule):
             await ctx.send('Couldn\'t find that quote')
 
 
-def setup(bot) -> None:
+async def setup(bot) -> None:
     """Load the Quotes cog."""
-    bot.add_cog(Quotes(bot))
+    await bot.add_cog(Quotes(bot))
