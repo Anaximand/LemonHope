@@ -39,6 +39,6 @@ class Legs(CommandModule):
         await author.remove_roles(butt_is_legs, butt_is_not_legs)
 
 
-def setup(bot) -> None:
+async def setup(bot) -> None:
     """Load the Quotes cog."""
-    bot.add_cog(Legs(bot))
+    await bot.add_cog(Legs(bot))

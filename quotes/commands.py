@@ -94,6 +94,6 @@ class Quotes(CommandModule):
             await ctx.send('Couldn\'t find that quote')
 
 
-def setup(bot) -> None:
+async def setup(bot) -> None:
     """Load the Quotes cog."""
-    bot.add_cog(Quotes(bot))
+    await bot.add_cog(Quotes(bot))
