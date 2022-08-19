@@ -27,6 +27,7 @@ async def registerModules(lemon):
     await conversions.setup(lemon)
     await help.setup(lemon)
     await settings.setup(lemon)
+    await birthdays.setup(lemon)
 
 def run():
     logger.info('Lemon is starting')
