@@ -11,6 +11,7 @@ import legs.commands as legs
 import conversions.commands as conversions
 import help.commands as help
 import settings.commands as settings
+import birthdays.commands as birthdays
 
 logging.getLogger("discord").setLevel(logging.WARNING)
 
