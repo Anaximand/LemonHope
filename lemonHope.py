@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 import quotes.commands as quotes
 import legs.commands as legs
 import conversions.commands as conversions
+import help.commands as help
 
 logging.getLogger("discord").setLevel(logging.WARNING)
 
@@ -22,6 +23,7 @@ async def registerModules(lemon):
     await quotes.setup(lemon)
     await legs.setup(lemon)
     await conversions.setup(lemon)
+    await help.setup(lemon)
 
 def run():
     logger.info('Lemon is starting')
