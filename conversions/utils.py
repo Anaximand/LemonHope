@@ -35,7 +35,7 @@ def reMatchToTuple(match) -> Tuple[float, str]:
         return
 
     val = float(match.group('value'))
-    unit = match.group('unit')
+    unit = match.group('unit').lower()
 
     return (val, unit)
 
