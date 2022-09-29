@@ -3,15 +3,54 @@ import json
 from typing import List, Tuple
 
 
+def getFloatValue(value: float) -> str:
+    """
+    Get the float value of an input value
+    ie, 1.01 will return 01 as a string
+    """
+    _, floatingValue = str(value).split('.')
+    return floatingValue
+
+def getFloatPrecision(value: float) -> int:
+    """
+    Get the float precision of an input value
+    """
+    return len(getFloatValue(value))
+
+def formatFloat(value: float, precision: int):
+    """
+    Format a float with a provided precision with some goodies
+    Format to the provided precision, except:
+    * If precision is zero, bump it to 1
+    * If precision value is zero, default to 0
+    """
+    floatingValue = getFloatValue(value)
+
+    if precision == 0:
+        precision = 1
+
+    if floatingValue == '0':
+        precision = 0;
+        value = int(value)
+
+    return round(value, precision)
+
+
 def buildConvertionStr(ogTuple: Tuple[str, float], convTuple: Tuple[str, float]) -> str:
     """
     Builds a conversion string segment given an original match and converted tuple
     Returns a string formated similar to "0.0c is 32.0f"
     """
-    messageTemplate = '{ogVal:.1f}{ogUnit} is {convVal:.1f}{convUnit}'
+    messageTemplate = '{ogVal}{ogUnit} is {convVal}{convUnit}'
 
     ogVal, ogUnit = ogTuple
     convVal, convUnit = convTuple
+
+    floatPrecision = getFloatPrecision(ogVal)
+
+    convVal = formatFloat(convVal, floatPrecision)
+    ogVal = formatFloat(ogVal, floatPrecision)
+
 
     return messageTemplate.format(ogVal=ogVal, ogUnit=ogUnit, convVal=convVal, convUnit=convUnit)
 
@@ -21,7 +60,7 @@ def getConversionTupleFromMessage(msg: str) -> List[Tuple[str, float]]:
     Returns a list of conversion tuples (str, float)
     """
     validUnits = "|".join(CONVERSION_MAP.keys())
-    conversionReg = re.compile(r'(?:^| )(?P<value>-?\d+(\.\d+)?) ?(?P<unit>%s)(?: |$)' % validUnits, re.IGNORECASE)
+    conversionReg = re.compile(r'(?:^| )(?P<value>-?\d+(\.\d+)?) ?(?P<unit>%s)(?:(?= )|$)' % validUnits, re.IGNORECASE)
     matches = conversionReg.finditer(msg)
 
     return list(map(reMatchToTuple, matches))
