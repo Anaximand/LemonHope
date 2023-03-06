@@ -23,7 +23,7 @@ class Quotes(CommandModule):
         if str(reaction.emoji) == '💬' and not any(r.me is True for r in reaction.message.reactions):
             quotepocket = getDBFromGuild(str(reaction.message.guild)).table(TABLE_NAME)
             qid = await saveQuote(
-                    quotepocket, reaction.message.author.name, reaction.message.content, reaction.message.jump_url, reaction.message.channel.send)
+                    quotepocket, reaction.message.author.name, reaction.message.content, reaction.message.attachments, reaction.message.jump_url, reaction.message.channel.send)
             self.logger.info('Saving quote #%d from %s via reaction', qid, reaction.message.author.name)
 
             await reaction.message.add_reaction('💬')
@@ -47,7 +47,7 @@ class Quotes(CommandModule):
 
         for ms in messages:
             if name in ms.author.name.lower() and (findString in ms.content.lower() or not findString) and "Lemon, " not in ms.content:
-                qid = await saveQuote(quotepocket, ms.author.name, ms.content, ms.jump_url, ctx.send)
+                qid = await saveQuote(quotepocket, ms.author.name, ms.content, ms.attachments, ms.jump_url, ctx.send)
                 self.logger.info('Saving quote #%d from %s via text command', qid, name)
 
                 found = True

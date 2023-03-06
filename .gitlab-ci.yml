@@ -15,7 +15,6 @@ build-prod:
     - docker
   stage: build
   script:
-    - IMAGE_TAG=$IMAGE_TAG docker-compose pull
     - IMAGE_TAG=$IMAGE_TAG docker-compose build
     - docker push $IMAGE_TAG
   only:
