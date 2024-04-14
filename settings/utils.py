@@ -1,20 +1,33 @@
+from utils import getGlobalSaveLock, getDBFromGuild
+from settings import modules, TABLE_NAME
 
-from utils import getGlobalSaveLock
+from tinydb import TinyDB, Query
 
-async def getSetting(table, key):
-    query = Query()
-    results = await table.search(query.key == key)
 
-    try:
-        settingsResult = results[0]
-    except IndexError:
+def canMemberManage(member):
+    isManager = member.guild_permissions.manage_guild or member.guild_permissions.administrator
+    isLemonManager = member.roles and any(role.name == 'The Lemon Keeper' for role in member.roles)
+    return isManager or isLemonManager
+
+def validateSetting(module, setting):
+    """
+    Validate that a setting exists
+    """
+    if module not in modules:
         return False
 
-    return settingsResult.value
+    if setting not in modules[module]:
+        return False
 
-async def saveSetting(table, key, value):
+    return True
+
+async def saveSetting(guild, module, setting, value):
+    """
+    Save settings, given a guild, module, and setting identifier
+    """
     async with getGlobalSaveLock():
-        settingToSave = { 'key': key, 'value': value }
+        db = getDBFromGuild(guild)
+        settingToSave = { 'guild': guild, 'module': module, 'setting': setting, 'value': value }
 
         query = Query()
-        await table.upset(settingToSave, query.key == key)
+        db.table(TABLE_NAME).upsert(settingToSave, query.guild == guild and query.module == module and query.setting == setting)

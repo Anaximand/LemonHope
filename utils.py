@@ -1,7 +1,6 @@
 import logging
 import asyncio
 
-from discord.ext import commands
 from tinydb import TinyDB
 
 globalSaveLock = asyncio.Lock()
@@ -14,11 +13,16 @@ def getDBFromGuild(guild):
     Retrieves db from guild name
     Returns TinyDB db
     """
-    return TinyDB(r'data/' + guild + r'.json')
+    return TinyDB(r'data/' + str(guild) + r'.json')
 
-class CommandModule(commands.Cog):
-
-    def __init__(self, bot):
-        self.bot = bot
-        self.logger = logging.getLogger(self.__class__.__name__)
-        self.logger.info('Registering %s', self.__class__.__name__)
+def safeEval(val):
+  """
+  Safely runs an eval to convert strings to correct types automatically.
+  Uses an empty built in dict to prevent function calls.
+  Returns the original value if eval fails
+  """
+  builtins = { '__builtins__': None }
+  try:
+    return eval(val, builtins)
+  except:
+    return val
