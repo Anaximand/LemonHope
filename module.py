@@ -1,5 +1,5 @@
 from utils import getGlobalSaveLock, getDBFromGuild
-from settings import TABLE_NAME
+from settings import TABLE_NAME, registerModule
 
 import inspect
 import logging
@@ -10,8 +10,33 @@ class CommandModule(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.MODULE_NAME = self.__class__.__name__.lower()
+        self.TABLE_NAME = self.MODULE_NAME
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.info('Registering %s', self.__class__.__name__)
+
+    def registerModule(self, settings):
+        return registerModule(self.MODULE_NAME, settings)
+
+def isEnabled(func):
+    """
+    Checks if the module is currently enabled.
+    If it's not enabled, the function will not be called.
+    NOTE: Must be applied to each function in a CommandModule
+    """
+    async def decorator(self, ctx, *args, **kwargs):
+        guild = ctx.guild or (ctx.message and ctx.message.guild)
+        settingValues = getSetting(guild, self.MODULE_NAME, 'enabled')
+
+        if (settingValues and not settingValues[0]):
+            return
+
+        await func(self, ctx, *args, **kwargs)
+
+    decorator.__name__ = func.__name__
+    sig = inspect.signature(func)
+    decorator.__signature__ = sig.replace(parameters=tuple(sig.parameters.values())[1:])  # from ctx onward
+    return decorator
 
 def getSetting(guild, module, setting):
     """
@@ -27,18 +52,3 @@ def getSetting(guild, module, setting):
         return None
 
     return settingsResult.get('value')
-
-def isEnabled(module):
-    def decorator(func):
-        async def wrapper(ctx, *args):
-            guild = ctx.guild or (ctx.message and ctx.message.guild)
-            if (not getSetting(guild, module, 'enabled')):
-                return False
-            return func(ctx, *args);
-
-        decorator.__name__ = func.__name__
-        sig = inspect.signature(func)
-        decorator.__signature__ = sig.replace(parameters=tuple(sig.parameters.values())[1:])  # from ctx onward
-
-        return wrapper
-    return decorator

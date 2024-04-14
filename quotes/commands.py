@@ -15,7 +15,7 @@ TABLE_NAME = 'quote'
 class Quotes(CommandModule):
     def __init__(self, bot):
         CommandModule.__init__(self, bot)
-        registerModule(MODULE_NAME, ['exclude_channels'])
+        self.registerModule(['exclude_channels'])
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
