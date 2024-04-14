@@ -1,14 +1,16 @@
 import os
 import re
+from module import getSetting
 from tinydb import Query
 
 from utils import getGlobalSaveLock
 from discord.abc import PrivateChannel
 
-def shouldExcludeChannel(channel, excludes) -> bool:
+def shouldExcludeChannel(guild, channel) -> bool:
     """
     Returns if a channel is excluded from quotes
     """
+    excludes = getSetting(guild, 'quotes', 'exclude_channels')
     return channel.id in excludes
 
 def isAlreadyRemembered(table, author, msg):

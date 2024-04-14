@@ -7,18 +7,20 @@ from tinydb import Query
 from module import CommandModule
 from utils import getDBFromGuild
 from quotes.utils import isAlreadyRemembered, saveQuote, getInt, shouldExcludeChannel
+from settings import registerModule
 
+MODULE_NAME = 'quote'
 TABLE_NAME = 'quote'
 
 class Quotes(CommandModule):
     def __init__(self, bot):
         CommandModule.__init__(self, bot)
-        self.exclude = self.bot.config.get('exclude_channels')
+        registerModule(MODULE_NAME, ['exclude_channels'])
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
         # Return early if private channel
-        if shouldExcludeChannel(reaction.message.channel, self.exclude):
+        if shouldExcludeChannel(reaction.message.guild, reaction.message.channel):
             return
 
         if str(reaction.emoji) == '💬' and not any(r.me is True for r in reaction.message.reactions):
