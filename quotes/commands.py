@@ -4,7 +4,8 @@ import re
 from discord.ext import commands
 from tinydb import Query
 
-from utils import CommandModule, getDBFromGuild
+from module import CommandModule
+from utils import getDBFromGuild
 from quotes.utils import isAlreadyRemembered, saveQuote, getInt, shouldExcludeChannel
 
 TABLE_NAME = 'quote'

@@ -1,7 +1,7 @@
 from discord.ext import commands
 from discord.utils import get
 
-from utils import CommandModule
+from module import CommandModule
 
 BUTT_IS_LEGS = 'butt is legs'
 BUTT_IS_NOT_LEGS = 'butt is not legs'

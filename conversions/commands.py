@@ -1,7 +1,7 @@
 from discord.ext import commands
 from conversions.utils import getConversionTupleFromMessage, convertMatch, buildConvertionStr
 
-from utils import CommandModule
+from module import CommandModule
 
 
 class Conversions(CommandModule):
