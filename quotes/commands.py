@@ -4,13 +4,12 @@ import re
 from discord.ext import commands
 from tinydb import Query
 
-from module import CommandModule
+from module import CommandModule, isEnabled
 from utils import getDBFromGuild
 from quotes.utils import isAlreadyRemembered, saveQuote, getInt, shouldExcludeChannel
 from settings import registerModule
 
-MODULE_NAME = 'quote'
-TABLE_NAME = 'quote'
+TABLE_NAME = 'quote' # TODO migrate away from this
 
 class Quotes(CommandModule):
     def __init__(self, bot):
@@ -18,6 +17,7 @@ class Quotes(CommandModule):
         self.registerModule(['exclude_channels'])
 
     @commands.Cog.listener()
+    @isEnabled
     async def on_reaction_add(self, reaction, user):
         # Return early if private channel
         if shouldExcludeChannel(reaction.message.guild, reaction.message.channel):
@@ -33,6 +33,7 @@ class Quotes(CommandModule):
 
 
     @commands.command()
+    @isEnabled
     async def remember(self, ctx, *, arg):
         # Return early if private channel
         if shouldExcludeChannel(ctx.channel, self.exclude):
@@ -61,6 +62,7 @@ class Quotes(CommandModule):
 
 
     @commands.command()
+    @isEnabled
     async def quote(self, ctx, *arg):
         quotepocket = getDBFromGuild(str(ctx.message.guild)).table(TABLE_NAME)
 
