@@ -1,12 +1,13 @@
 from discord.ext import commands
 from conversions.utils import getConversionTupleFromMessage, convertMatch, buildConvertionStr
 
-from utils import CommandModule
+from module import CommandModule, isEnabled
 
 
 class Conversions(CommandModule):
 
     @commands.Cog.listener()
+    @isEnabled
     async def on_message(self, message):
         if message.author == self.bot.user:
             return

@@ -4,20 +4,23 @@ import re
 from discord.ext import commands
 from tinydb import Query
 
-from utils import CommandModule, getDBFromGuild
+from module import CommandModule, isEnabled
+from utils import getDBFromGuild
 from quotes.utils import isAlreadyRemembered, saveQuote, getInt, shouldExcludeChannel
+from settings import registerModule
 
-TABLE_NAME = 'quote'
+TABLE_NAME = 'quote' # TODO migrate away from this
 
 class Quotes(CommandModule):
     def __init__(self, bot):
         CommandModule.__init__(self, bot)
-        self.exclude = self.bot.config.get('exclude_channels')
+        self.registerModule(['exclude_channels'])
 
     @commands.Cog.listener()
+    @isEnabled
     async def on_reaction_add(self, reaction, user):
         # Return early if private channel
-        if shouldExcludeChannel(reaction.message.channel, self.exclude):
+        if shouldExcludeChannel(reaction.message.guild, reaction.message.channel):
             return
 
         if str(reaction.emoji) == '💬' and not any(r.me is True for r in reaction.message.reactions):
@@ -30,6 +33,7 @@ class Quotes(CommandModule):
 
 
     @commands.command()
+    @isEnabled
     async def remember(self, ctx, *, arg):
         # Return early if private channel
         if shouldExcludeChannel(ctx.channel, self.exclude):
@@ -58,6 +62,7 @@ class Quotes(CommandModule):
 
 
     @commands.command()
+    @isEnabled
     async def quote(self, ctx, *arg):
         quotepocket = getDBFromGuild(str(ctx.message.guild)).table(TABLE_NAME)
 

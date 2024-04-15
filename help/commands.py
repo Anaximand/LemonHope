@@ -2,7 +2,7 @@ from discord.ext import commands
 from discord.utils import get
 from random import choice
 
-from utils import CommandModule
+from module import CommandModule
 
 SOURCE_URL = 'https://github.com/Anaximand/LemonHope/';
 HI = [
