@@ -1,7 +1,7 @@
 from discord.ext import commands
 from discord.utils import get
 
-from module import CommandModule
+from module import CommandModule, isEnabled
 
 BUTT_IS_LEGS = 'butt is legs'
 BUTT_IS_NOT_LEGS = 'butt is not legs'
@@ -11,6 +11,7 @@ NO_BUTT_OR_LEGS = 'no butt or legs'
 class Legs(CommandModule):
 
     @commands.Cog.listener()
+    @isEnabled
     async def on_message(self, message):
         content = message.content.lower()
         author = message.author

@@ -12,8 +12,8 @@ class CommandModule(commands.Cog):
         self.bot = bot
         self.MODULE_NAME = self.__class__.__name__.lower()
         self.TABLE_NAME = self.MODULE_NAME
-        self.logger = logging.getLogger(self.__class__.__name__)
-        self.logger.info('Registering %s', self.__class__.__name__)
+        self.logger = logging.getLogger(self.MODULE_NAME)
+        self.logger.info('Registering %s', self.MODULE_NAME)
 
     def registerModule(self, settings):
         return registerModule(self.MODULE_NAME, settings)
