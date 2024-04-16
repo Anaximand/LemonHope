@@ -9,7 +9,7 @@ def formatDate(dt):
 def parseMonthDay(datestr):
     try:
         dt = parser.parse(datestr)
-        return formatBirthday(dt)
+        return formatDate(dt)
     except:
         return None
 
@@ -24,7 +24,7 @@ async def saveBirthday(table, birthday, authorId):
         else:
             table.insert({'author': authorId, 'birthday': birthday})
 
-async def getBirthdaysOnDate(table, date):
+def getBirthdaysOnDate(table, date):
     searchDate = formatDate(date)
     query = Query()
 
