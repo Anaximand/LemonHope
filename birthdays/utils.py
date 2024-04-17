@@ -13,16 +13,16 @@ def parseMonthDay(datestr):
     except:
         return None
 
-async def saveBirthday(table, birthday, authorId):
+async def saveBirthday(table, birthday, userId):
     """
     save birthday to db
     """
     async with getGlobalSaveLock():
-        bid = isAlreadySaved(table, birthday, authorId)
+        bid = isAlreadySaved(table, birthday, userId)
         if bid:
             table.update({'birthday': birthday}, doc_ids=[bid])
         else:
-            table.insert({'author': authorId, 'birthday': birthday})
+            table.insert({'userId': userId, 'mention': '<@%s>' % userId, 'birthday': birthday})
 
 def getBirthdaysOnDate(table, date):
     searchDate = formatDate(date)
@@ -30,9 +30,9 @@ def getBirthdaysOnDate(table, date):
 
     return table.search(query.birthday == searchDate)
 
-def isAlreadySaved(table, birthday, authorId):
+def isAlreadySaved(table, birthday, userId):
     query = Query()
-    results = table.search(query.author == authorId)
+    results = table.search(query.userId == userId)
 
     try:
         singleResult = results[0]

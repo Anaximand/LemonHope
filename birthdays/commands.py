@@ -1,11 +1,15 @@
-from datetime import datetime
+from datetime import datetime, timezone, timedelta, time
 from discord.ext import commands, tasks
 
 from utils import getDBFromGuild
 from module import CommandModule, getSetting, isEnabled
 from birthdays.utils import getBirthdaysOnDate, saveBirthday, parseMonthDay
 
-TABLE_NAME = 'birthday'
+utc = timezone.utc
+
+# If no tzinfo is given then UTC is assumed.
+timeToRun = time(hour=17, minute=0, tzinfo=utc)
+
 
 class Birthdays(CommandModule):
     def __init__(self, bot):
@@ -24,47 +28,44 @@ class Birthdays(CommandModule):
         if not birthday:
             return await ctx.channel.send('Oops! I couldn\'t understand that.')
 
-        birthdaypocket = getDBFromGuild(str(ctx.message.guild)).table(TABLE_NAME)
+        birthdaypocket = getDBFromGuild(str(ctx.message.guild)).table(self.TABLE_NAME)
 
-        await saveBirthday(birthdaypocket, birthday, ctx.message.author.mention)
+        await saveBirthday(birthdaypocket, birthday, ctx.message.author.id)
 
         await ctx.message.channel.send('Your birthday is %s. Got it! *If I misunderstood, you can just tell me again!*' % birthday)
 
-    @birthday.error
-    async def birthday_loop_error(self, error):
-        print('error', error)
-
-    @tasks.loop(seconds=10.0)
+    @tasks.loop(time=timeToRun)
     async def birthday_loop(self):
-        # This normally runs at 1pm bot time
         today = datetime.now()
-        # Disabled for testing
-        # Just keep swimmin' if its not 1pm bot time
-        # if today.hour != 13:
-            # return
+        self.logger.info('Checking for birthdays on %s' % today)
 
-        for guild in self.bot.guild:
-            isEnabled = getSetting(guild, self.MODULE_NAME, 'enabled')
-            channelId = getSetting(guild, self.MODULE_NAME, 'channel')
+        for guild in self.bot.guilds:
+            # TODO - We shouldn't default to lists, this sucks
+            isEnabled = (getSetting(guild, self.MODULE_NAME, 'enabled') or [None])[0]
+            channelId = (getSetting(guild, self.MODULE_NAME, 'channel') or [None])[0]
+
             if not isEnabled or not channelId:
                 continue
 
-            birthdaypocket = getDBFromGuild(str(guild)).table(TABLE_NAME)
+            birthdaypocket = getDBFromGuild(str(guild)).table(self.TABLE_NAME)
             birthdays = getBirthdaysOnDate(birthdaypocket, today)
 
             if len(birthdays) == 0:
+                self.loggers.info('(%s) no birthdays found' % guild)
                 continue
 
             channel = guild.get_channel(channelId)
 
+            self.logger.info('(%s) Found %s birthdays' % (guild, len(birthdays)))
+
             for birthday in birthdays:
-                # figure out how to get channel to send too
-                birthdayMessage = 'Happy Birthday %s!' % birthday.author
+                # TODO custom message
+                birthdayMessage = 'Happy Birthday %s!' % birthday.get('mention')
                 await channel.send(birthdayMessage)
 
     @birthday_loop.before_loop
     async def before_birthday_loop(self):
-        # This wait isn't finishing
+        # Before running, ensure the bot is ready
         await self.bot.wait_until_ready()
 
 async def setup(bot) -> None:
