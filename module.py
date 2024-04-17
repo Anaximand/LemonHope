@@ -15,7 +15,7 @@ class CommandModule(commands.Cog):
         self.logger = logging.getLogger(self.MODULE_NAME)
         self.logger.info('Registering %s', self.MODULE_NAME)
 
-    def registerModule(self, settings):
+    def registerModule(self, settings = []):
         return registerModule(self.MODULE_NAME, settings)
 
 def isEnabled(func):

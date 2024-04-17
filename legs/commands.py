@@ -9,6 +9,9 @@ NO_BUTT_OR_LEGS = 'no butt or legs'
 
 
 class Legs(CommandModule):
+    def __init__(self, bot):
+        CommandModule.__init__(self, bot)
+        self.registerModule()
 
     @commands.Cog.listener()
     @isEnabled
