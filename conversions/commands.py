@@ -5,6 +5,9 @@ from module import CommandModule, isEnabled
 
 
 class Conversions(CommandModule):
+    def __init__(self, bot):
+        CommandModule.__init__(self, bot)
+        self.registerModule()
 
     @commands.Cog.listener()
     @isEnabled
