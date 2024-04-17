@@ -23,8 +23,10 @@ class Birthdays(CommandModule):
 
     @commands.command()
     async def birthday(self, ctx, *args):
+        if len(args) != 1:
+            return await ctx.channel.send('If you\'d like you to tell me your birthday use "Lemon, birthday m/d"')
+
         birthday = parseMonthDay(args[0])
-        print(args[0], birthday)
         if not birthday:
             return await ctx.channel.send('Oops! I couldn\'t understand that.')
 
