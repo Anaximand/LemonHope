@@ -11,6 +11,7 @@ import legs.commands as legs
 import conversions.commands as conversions
 import help.commands as help
 import settings.commands as settings
+import birthdays.commands as birthdays
 
 logging.getLogger("discord").setLevel(logging.WARNING)
 
@@ -26,6 +27,7 @@ async def registerModules(lemon):
     await conversions.setup(lemon)
     await help.setup(lemon)
     await settings.setup(lemon)
+    await birthdays.setup(lemon)
 
 def run():
     logger.info('Lemon is starting')
@@ -34,15 +36,15 @@ def run():
 
     lemon = commands.Bot(command_prefix="Lemon, ", intents=intents, log_handler=None)
 
-    # Todo - make a better config
-    lemon.config = {}
-    lemon.config['exclude_channels'] = [int(channel) for channel in (os.getenv('exclude_channels') or '').split(',') if channel != '']
+    # Register all modules during startup
+    @lemon.event
+    async def setup_hook():
+        await registerModules(lemon)
 
-    # Modules must be awaited, but the bot cant be in an event loop
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(registerModules(lemon))
+    @lemon.event
+    async def on_ready():
+        logger.info('Lemon has started')
 
-    lemon.run(token)
-    logger.info('Lemon has started')
+    lemon.run(token, log_level=logging.INFO)
 
 run()

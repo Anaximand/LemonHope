@@ -4,7 +4,6 @@ from module import getSetting
 from tinydb import Query
 
 from utils import getGlobalSaveLock
-from discord.abc import PrivateChannel
 
 def shouldExcludeChannel(guild, channel) -> bool:
     """
