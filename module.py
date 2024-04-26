@@ -1,4 +1,4 @@
-from utils import getGlobalSaveLock, getDBFromGuild
+from utils import findAttribute, getGlobalSaveLock, getDBFromGuild
 from settings import TABLE_NAME, registerModule
 
 import inspect
@@ -25,7 +25,7 @@ def isEnabled(func):
     NOTE: Must be applied to each function in a CommandModule
     """
     async def decorator(self, ctx, *args, **kwargs):
-        guild = ctx.guild or (ctx.message and ctx.message.guild)
+        guild = findAttribute(ctx, 'guild')
         settingValues = getSetting(guild, self.MODULE_NAME, 'enabled')
 
         if (settingValues and not settingValues[0]):

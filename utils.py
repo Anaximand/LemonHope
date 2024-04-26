@@ -26,3 +26,37 @@ def safeEval(val):
     return eval(val, builtins)
   except:
     return val
+
+
+primitives = (bool, str, int, float, type(None))
+
+def isPrimitive(obj):
+    """
+    Returns if an object is a "primative" type
+    """
+    return isinstance(obj, primitives)
+
+def findAttribute(obj, target, depth=0):
+    """
+    Recursively searches for an attribute in an object
+    """
+    attrs = [attr for attr in dir(obj) if not attr.startswith('_')]
+
+    # Guard against recursion issues
+    if len(attrs) == 0 or depth > 5:
+        return
+
+    if target in attrs:
+        return getattr(obj, target)
+
+    for attr in attrs:
+        attrObj = getattr(obj, attr)
+
+        # Ignore "primative" types, they will cycle endlessly
+        if isPrimitive(attrObj):
+            continue
+
+        potentialTarget = findAttribute(attrObj, target, depth+1)
+
+        if potentialTarget:
+            return potentialTarget
