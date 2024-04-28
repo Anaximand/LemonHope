@@ -9,7 +9,7 @@ def shouldExcludeChannel(guild, channel) -> bool:
     """
     Returns if a channel is excluded from quotes
     """
-    excludes = getSetting(guild, 'quotes', 'exclude_channels')
+    excludes = getSetting(guild, 'quotes', 'exclude_channels') or []
     return channel.id in excludes
 
 def isAlreadyRemembered(table, author, msg):
