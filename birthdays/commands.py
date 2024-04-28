@@ -8,7 +8,7 @@ from birthdays.utils import getBirthdaysOnDate, saveBirthday, parseMonthDay
 utc = timezone.utc
 
 # If no tzinfo is given then UTC is assumed.
-timeToRun = time(hour=17, minute=0, tzinfo=utc)
+timeToRun = time(hour=13, minute=0, tzinfo=utc)
 
 
 class Birthdays(CommandModule):
