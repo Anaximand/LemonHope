@@ -53,7 +53,7 @@ class Birthdays(CommandModule):
             birthdays = getBirthdaysOnDate(birthdaypocket, today)
 
             if len(birthdays) == 0:
-                self.loggers.info('(%s) no birthdays found' % guild)
+                self.logger.info('(%s) no birthdays found' % guild)
                 continue
 
             channel = guild.get_channel(channelId)
