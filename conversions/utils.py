@@ -126,6 +126,20 @@ def convertPoundsToKilograms(pound: float) -> Tuple[float, str]:
     """
     return (pound / 2.205, 'kg')
 
+def convertLiterToGallon(liter: float) -> Tuple[float, str]:
+    """
+    Converts liter to gallon.
+    Return (gallon, unit)
+    """
+    return (liter * 0.264172, 'gal')
+
+def convertGallonToLiter(gallon: float) -> Tuple[float, str]:
+    """
+    Converts gallon to liter.
+    Return (liter, unit)
+    """
+    return (gallon / 0.264172, 'l')
+
 def notImplemented():
 
     """
@@ -139,4 +153,6 @@ CONVERSION_MAP = {
     'kelvin': convertKelvinToCelsius,
     'kg': convertKilogramsToPounds,
     'lb': convertPoundsToKilograms,
+    'l': convertLiterToGallon,
+    'gal': convertGallonToLiter
 }
