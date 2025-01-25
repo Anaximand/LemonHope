@@ -140,6 +140,36 @@ def convertGallonToLiter(gallon: float) -> Tuple[float, str]:
     """
     return (gallon / 0.264172, 'l')
 
+def convertMeterToFeet(meter: float) -> Tuple[float, str]:
+    """
+    Converts meter to feet
+    Return (feet, unit)
+    """
+    return (meter * 3.280839895, 'ft')
+
+def convertFeetToMeter(feet: float) -> Tuple[float, str]:
+    """
+    Converts feet to meters
+    Return (meters, unit)
+    """
+    return (feet / 3.280839895, 'm')
+
+def convertMilesToKilometer(miles: float) -> Tuple[float, str]:
+    """
+    Converts miles to kilometer
+    Return (kilometer, unit)
+    """
+    return (miles * 1.609344, 'km')
+
+
+def convertKilometerToMiles(kilometer: float) -> Tuple[float, str]:
+    """
+    Converts kilometer to miles
+    Return (miles, unit)
+    """
+    return (kilometer / 1.609344, 'mi')
+
+
 def notImplemented():
 
     """
@@ -154,5 +184,9 @@ CONVERSION_MAP = {
     'kg': convertKilogramsToPounds,
     'lb': convertPoundsToKilograms,
     'l': convertLiterToGallon,
-    'gal': convertGallonToLiter
+    'gal': convertGallonToLiter,
+    'ft': convertFeetToMeter,
+    'm': convertMeterToFeet,
+    'km': convertKilometerToMiles,
+    'mi': convertMilesToKilometer
 }
