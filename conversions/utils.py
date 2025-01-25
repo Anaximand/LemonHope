@@ -60,7 +60,7 @@ def getConversionTupleFromMessage(msg: str) -> List[Tuple[str, float]]:
     Returns a list of conversion tuples (str, float)
     """
     validUnits = "|".join(CONVERSION_MAP.keys())
-    conversionReg = re.compile(r'(?:^| )(?P<value>-?\d+(\.\d+)?) ?(?P<unit>%s)(?:(?= )|$)' % validUnits, re.IGNORECASE)
+    conversionReg = re.compile(r'(?:^| )(?P<value>-?\d+(\.\d+)?) ?(?P<unit>%s)(?:(?= )|\W|$)' % validUnits, re.IGNORECASE)
     matches = conversionReg.finditer(msg)
 
     return list(map(reMatchToTuple, matches))
