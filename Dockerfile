@@ -1,4 +1,4 @@
-FROM python:3.10-alpine
+FROM python:3.14-alpine3.23
 
 RUN apk add alpine-sdk
 
@@ -9,7 +9,7 @@ COPY Pipfile ./
 COPY Pipfile.lock ./
 
 RUN pip install pipenv \
-    && pipenv install --system --deploy
+  && pipenv install --system --deploy
 
 COPY . .
 

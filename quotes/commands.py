@@ -76,7 +76,7 @@ class Quotes(CommandModule):
         # Logic for number based searching
         numCapture, numQuery = [None, None]
         if searchQuery:
-            numCapture = re.compile('#(\d+)')
+            numCapture = re.compile('#(\\d+)')
             numQuery = numCapture.match(searchQuery)
 
         msg = None
