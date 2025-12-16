@@ -11,7 +11,7 @@ services:
       restart_policy:
         condition: on-failure
     volumes:
-      - /opt/data/dftba-lemon:/opt/lemon/data/
-      - /opt/data/dftba-lemon/env:/opt/lemon/.env
+      - ./data:/opt/lemon/data/
+      - ./.env:/opt/lemon/.env
     networks:
       - default
