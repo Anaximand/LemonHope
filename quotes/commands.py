@@ -7,14 +7,16 @@ from tinydb import Query
 from module import CommandModule, isEnabled
 from utils import getDBFromGuild
 from quotes.utils import isAlreadyRemembered, saveQuote, getInt, shouldExcludeChannel
-from settings import registerModule
+from settings import registerModule, SettingSpec
 
 TABLE_NAME = 'quote' # TODO migrate away from this
 
 class Quotes(CommandModule):
     def __init__(self, bot):
         CommandModule.__init__(self, bot)
-        self.registerModule(['exclude_channels'])
+        self.registerModule([
+            SettingSpec('exclude_channels', description='Channel IDs to exclude from quote collection', type=list[int]),
+        ])
 
     @commands.Cog.listener()
     @isEnabled

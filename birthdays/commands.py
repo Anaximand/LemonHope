@@ -3,6 +3,7 @@ from discord.ext import commands, tasks
 
 from utils import getDBFromGuild
 from module import CommandModule, getSetting, isEnabled
+from settings import SettingSpec
 from birthdays.utils import getBirthdaysOnDate, saveBirthday, parseMonthDay
 
 utc = timezone.utc
@@ -14,7 +15,9 @@ timeToRun = time(hour=13, minute=0, tzinfo=utc)
 class Birthdays(CommandModule):
     def __init__(self, bot):
         CommandModule.__init__(self, bot)
-        self.registerModule(['channel'])
+        self.registerModule([
+            SettingSpec('channel', description='Channel ID for birthday announcements', type=int),
+        ])
         self.task = self.birthday_loop.start()
 
     def cog_unload(self):
