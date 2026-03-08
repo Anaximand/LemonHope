@@ -1,9 +1,26 @@
-modules = dict()
+from dataclasses import dataclass
+from typing import Any, Type
+
+modules: dict[str, dict[str, "SettingSpec"]] = dict()
 
 TABLE_NAME = 'settings'
 
-def registerModule(module, settingNames) -> None:
+
+@dataclass(frozen=True)
+class SettingSpec:
+    name: str
+    description: str = ""
+    type: Type[Any] | None = None
+
+
+def registerModule(module: str, setting_specs: list[SettingSpec] | None = None) -> None:
     """
-    Register a setting module
+    Register a setting module. Always includes "enabled". Optionally add more specs.
     """
-    modules[module] = ['enabled'] + settingNames
+    specs = {s.name: s for s in (setting_specs or [])}
+    specs["enabled"] = SettingSpec(
+        "enabled",
+        description="Whether this module is enabled",
+        type=bool,
+    )
+    modules[module] = specs

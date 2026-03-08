@@ -1,5 +1,5 @@
 from utils import getGlobalSaveLock, getDBFromGuild
-from settings import modules, TABLE_NAME
+from settings import modules, TABLE_NAME, SettingSpec
 
 from tinydb import TinyDB, Query
 
@@ -9,17 +9,17 @@ def canMemberManage(member):
     isLemonManager = member.roles and any(role.name == 'The Lemon Keeper' for role in member.roles)
     return isManager or isLemonManager
 
+
 def validateSetting(module, setting):
     """
     Validate that a setting exists
     """
-    if module not in modules:
-        return False
+    return setting in modules.get(module, {})
 
-    if setting not in modules[module]:
-        return False
 
-    return True
+def get_setting_spec(module: str, setting: str) -> SettingSpec | None:
+    """Return the SettingSpec for (module, setting), or None if not registered."""
+    return modules.get(module, {}).get(setting)
 
 async def saveSetting(guild, module, setting, value):
     """
