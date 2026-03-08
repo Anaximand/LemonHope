@@ -1,4 +1,5 @@
 FROM python:3.14-alpine3.23
+ARG VERSION
 
 RUN apk add alpine-sdk
 
@@ -12,5 +13,7 @@ RUN pip install pipenv \
   && pipenv install --system --deploy
 
 COPY . .
+
+RUN echo $VERSION > VERSION_FILE
 
 CMD ["python3", "lemonHope.py"]
