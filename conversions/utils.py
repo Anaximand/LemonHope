@@ -52,7 +52,7 @@ def buildConvertionStr(ogTuple: Tuple[str, float], convTuple: Tuple[str, float])
     ogVal = formatFloat(ogVal, floatPrecision)
 
 
-    return messageTemplate.format(ogVal=ogVal, ogUnit=ogUnit, convVal=convVal, convUnit=convUnit)
+    return messageTemplate.format(ogVal=f'{ogVal:,}', ogUnit=ogUnit, convVal=f'{convVal:,}', convUnit=convUnit)
 
 def getConversionTupleFromMessage(msg: str) -> List[Tuple[str, float]]:
     """
