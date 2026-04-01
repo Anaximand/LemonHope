@@ -170,6 +170,22 @@ def convertKilometerToMiles(kilometer: float) -> Tuple[float, str]:
     return (kilometer / 1.609344, 'mi')
 
 
+def convertMphToKmh(mph: float) -> Tuple[float, str]:
+    """
+    Converts miles per hour to kilometers per hour
+    Return (kmh, unit)
+    """
+    return (mph * 1.609344, 'kmh')
+
+
+def convertKmhToMph(kmh: float) -> Tuple[float, str]:
+    """
+    Converts kilometers per hour to miles per hour
+    Return (mph, unit)
+    """
+    return (kmh / 1.609344, 'mph')
+
+
 def notImplemented():
 
     """
@@ -188,5 +204,11 @@ CONVERSION_MAP = {
     'ft': convertFeetToMeter,
     'm': convertMeterToFeet,
     'km': convertKilometerToMiles,
-    'mi': convertMilesToKilometer
+    'kilometers': convertKilometerToMiles,
+    'mi': convertMilesToKilometer,
+    'miles': convertMilesToKilometer,
+    'mph': convertMphToKmh,
+    'mi/h': convertMphToKmh,
+    'kmh': convertKmhToMph,
+    'km/h': convertKmhToMph
 }
